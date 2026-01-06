@@ -1,5 +1,5 @@
 from player import Player
-from objects import Block, Fire, Coin, Portal, Flag, Hearts
+from objects import Block, Fire, Coin, Portal, Flag, Hearts,MovingPlatform, Spike
 from utils import get_block
 
 
@@ -25,7 +25,26 @@ def generate_world(width, height, block_size):
                           Block(block_size * 8, height -
                                 block_size * 4, block_size),
                           Block(block_size * 12, height - block_size * 3, block_size), fire]
-    objects = vertical_blocks + additional_objects + coins + [portal1, portal2]
+    start_y = height - block_size * 3
+    moving_platform = MovingPlatform(
+        x=width * 2 - 300,
+        y=start_y,
+        block_size=block_size,
+        path=[
+            (width * 2 - 300, start_y),
+            (width * 2 - 500, start_y)
+        ],
+        speed=2
+    )
+
+
+
+
+    spike1 = Spike(350, height - block_size - 16, 32, 16)
+    spike2 = Spike(350 + 32, height - block_size - 16, 32, 16)
+    spike3 = Spike(350 + 64, height - block_size - 16, 32, 16)
+
+    objects = vertical_blocks + additional_objects + coins + [portal1, portal2, moving_platform, spike1, spike2,spike3]
     flag = Flag(width * 2 - 100, height - (block_size * 1.65) - 64, 64, 64)
     objects.append(flag)
     return player, objects, portal1, portal2
@@ -67,7 +86,7 @@ def handle_move(player, objects, portal1, portal2, hearts, PLAYER_VEL):
     to_check = [collide_left, collide_right, *vertical_collide]
     for obj in to_check:
         if obj:
-            if obj.name == "fire" and not player.hit:
+            if obj.name in ("fire","spike") and not player.hit:
                 player.make_hit()
                 hearts.set_health(hearts.current_health - 1)
                 hearts.check_death()

@@ -171,3 +171,38 @@ class Hearts:
 
     def check_death(self):
         self.dead = self.current_health <= 0
+
+class MovingPlatform(Object):
+    def __init__(self, x, y, block_size, path, speed=2):
+        width = block_size * 3
+        height = block_size
+        super().__init__(x, y, width, height, "moving_platform")
+        self.path = path
+        self.speed = speed
+        self.target_index = 0
+        for i in range(3):
+            block = get_block(block_size)
+            self.image.blit(block, (i * block_size, 0))
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def loop(self):
+        target_x, target_y = self.path[self.target_index]
+        dx = target_x - self.rect.x
+        dy = target_y - self.rect.y
+        dist = (dx ** 2 + dy ** 2) ** 0.5
+
+        if dist < self.speed or dist == 0:
+            self.rect.topleft = (target_x, target_y)
+            self.target_index = (self.target_index + 1) % len(self.path)
+        else:
+            self.rect.x += self.speed * dx / dist
+            self.rect.y += self.speed * dy / dist
+
+class Spike(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "spike")
+        self.image.fill((0, 0, 0, 0))
+        points = [(0, height), (width // 2, 0), (width, height)]
+        pygame.draw.polygon(self.image, (200, 0, 0), points)
+        self.mask = pygame.mask.from_surface(self.image)
+
