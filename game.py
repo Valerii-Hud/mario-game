@@ -40,6 +40,21 @@ def main_game(window):
                 if hasattr(obj, "loop"):
                     obj.loop()
             handle_move(player, objects, portal1, portal2, hearts, PLAYER_VEL)
+            player.on_platform = False
+            player.platform = None
+            for obj in objects:
+                if obj.name == "moving_platform":
+                    if player.rect.bottom <= obj.rect.top + 5 and \
+                       player.rect.bottom >= obj.rect.top - 5 and \
+                       player.rect.right > obj.rect.left and \
+                       player.rect.left < obj.rect.right and \
+                       player.y_vel >= 0:
+
+                        player.rect.bottom = obj.rect.top
+                        player.landed()
+                        player.on_platform = True
+                        player.platform = obj
+
             score += collect_coins(player, objects)
             game_over = hearts.dead
             level_completed = any(

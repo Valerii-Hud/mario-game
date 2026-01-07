@@ -25,6 +25,9 @@ class Player(pygame.sprite.Sprite):
         self.appearing = False
         self.disappearing = False
         self.fade_alpha = 0
+        self.on_platform = False
+        self.platform = None
+
 
     def jump(self):
         self.y_vel = -self.GRAVITY * 8
@@ -98,6 +101,10 @@ class Player(pygame.sprite.Sprite):
     def loop(self, fps):
         self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY)
         self.move(self.x_vel, self.y_vel)
+        if self.on_platform and self.platform:
+            self.rect.x += self.platform.delta_x
+            self.rect.y += self.platform.delta_y
+
         if self.hit:
             self.hit_count += 1
         if self.hit_count > fps:
